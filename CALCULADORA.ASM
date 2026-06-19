@@ -9,8 +9,9 @@ section .data
     msg3 db ', bem-vindo ao programa de CALC IA-32', 10, 0
     len_msg3 equ $ - msg3
 
-    msg4 db 10, 'Vai trabalhar com 16 ou 32 bits (digite 0 para 16, e 1 para 32): ', 0
+    msg4 db 'Vai trabalhar com 16 ou 32 bits (digite 0 para 16, e 1 para 32): ', 0
     len_msg4 equ $ - msg4
+
 
 section .bss
     ; variaveis globais
@@ -55,6 +56,18 @@ _start:
     push len_msg3
     push msg3
     call print
+    add esp, 8
+
+    ; imprime msg4
+    push len_msg4
+    push msg4
+    call print
+    add esp, 8
+
+    ; lê precisao
+    push 2
+    push precisao
+    call input
     add esp, 8
 
     ; fim do programa
