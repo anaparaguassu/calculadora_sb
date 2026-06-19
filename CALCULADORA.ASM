@@ -9,9 +9,13 @@ section .data
     msg3 db ', bem-vindo ao programa de CALC IA-32', 10, 0
     len_msg3 equ $ - msg3
 
+    msg4 db 10, 'Vai trabalhar com 16 ou 32 bits (digite 0 para 16, e 1 para 32): ', 0
+    len_msg4 equ $ - msg4
+
 section .bss
     ; variaveis globais
     nome resb 50        ; reserva 50 bytes pro nome
+    precisao resb 2     ; reserva espaço pra precisão (0 ou 1 + ENTER)
 
 section .text
     global _start
