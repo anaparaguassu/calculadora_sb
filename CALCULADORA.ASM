@@ -174,3 +174,55 @@ input:
 
     pop ebp
     ret
+
+input16:
+    push ebp
+    mov ebp, esp
+
+    ; lê a entrada
+    sub esp, 8          ; aloca 8 bytes na pilha
+    mov eax, 3          ; syscall pra read
+    mov ebx, 0          ; entrada padrão
+    lea ecx, [ebp-8]    ; ponteiro pra variável local
+    mov edx, 7          ; tamanho máximo
+    int 0x80
+
+    ; prepara a conversão
+    mov ecx, eax        ; ecx guarda a quantidade de bytes lidos
+    lea esi, [ebp - 8]  ; esi aponta pro inicio do texto 
+    xor eax, eax        ; eax vai somar no resultado final
+    xor ebx, ebx        ; ebx vai guardar cada digito individualmente
+    mov di, 1           ; di vai guardar o sinal (1 = positivo, -1 = negativo)
+
+    ; verifica se é negativo
+    cmp byte [esi], '-'
+    jne .loop_conversao16
+    mov di, -1          ; muda o sinal pra negativo
+    inc esi             ; pula o caractere '-'
+    dec ecx             ; diminui a quantidade de bytes a processar
+
+.loop_conversao16:
+    mov bl, [esi]       ; pega 1 caractere
+    cmp bl, 10          ; é ENTER?
+    je .fim_conversao16   
+    cmp bl, '0'         ; é < '0'?
+    jl .fim_conversao16
+    cmp bl, '9'         ; é > '9'?
+    jg .fim_conversao16
+
+    ; (acumulado*10) + dígito
+    sub bl, '0'         ; converte ASCII para número real
+    mov dx, 10         
+    mul dx              ; ax = ax*10
+    add ax, bx          ; soma o dígito atual
+
+    inc esi             ; avança pro próximo caractere
+    dec ecx             ; diminui o contador
+    jnz .loop_conversao16
+
+.fim_conversao16:
+    imul ax, di         ; multiplica pelo sinal (1 ou -1)
+    movsx eax, ax       ; estendo o resultado pra preencher corretamento o eax
+    mov esp, ebp        ; limpa as variáveis locais
+    pop ebp
+    ret                 ; retorna com número pronto no eax
