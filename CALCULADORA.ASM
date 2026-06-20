@@ -189,7 +189,7 @@ input16:
 
     ; prepara a conversão
     mov ecx, eax        ; ecx guarda a quantidade de bytes lidos
-    lea esi, [ebp - 8]  ; esi aponta pro inicio do texto 
+    lea esi, [ebp-8]    ; esi aponta pro inicio do texto 
     xor eax, eax        ; eax vai somar no resultado final
     xor ebx, ebx        ; ebx vai guardar cada digito individualmente
     mov di, 1           ; di vai guardar o sinal (1 = positivo, -1 = negativo)
@@ -223,6 +223,57 @@ input16:
 .fim_conversao16:
     imul ax, di         ; multiplica pelo sinal (1 ou -1)
     movsx eax, ax       ; estendo o resultado pra preencher corretamento o eax
+    mov esp, ebp        ; limpa as variáveis locais
+    pop ebp
+    ret                 ; retorna com número pronto no eax
+
+input32:
+    push ebp
+    mov ebp, esp
+
+    ; lê a entrada
+    sub esp, 16         ; aloca 16 bytes na pilha
+    mov eax, 3          ; syscall pra read
+    mov ebx, 0          ; entrada padrão
+    lea ecx, [ebp-16]   ; ponteiro pra variável local
+    mov edx, 15         ; tamanho máximo
+    int 0x80
+
+    ; prepara a conversão
+    mov ecx, eax        ; ecx guarda a quantidade de bytes lidos
+    lea esi, [ebp-16]   ; esi aponta pro inicio do texto 
+    xor eax, eax        ; eax vai somar no resultado final
+    xor ebx, ebx        ; ebx vai guardar cada digito individualmente
+    mov edi, 1          ; edi vai guardar o sinal (1 = positivo, -1 = negativo)
+
+    ; verifica se é negativo
+    cmp byte [esi], '-'
+    jne .loop_conversao32
+    mov edi, -1         ; muda o sinal pra negativo
+    inc esi             ; pula o caractere '-'
+    dec ecx             ; diminui a quantidade de bytes a processar
+
+.loop_conversao32:
+    mov bl, [esi]       ; pega 1 caractere
+    cmp bl, 10          ; é ENTER?
+    je .fim_conversao32   
+    cmp bl, '0'         ; é < '0'?
+    jl .fim_conversao32
+    cmp bl, '9'         ; é > '9'?
+    jg .fim_conversao32
+
+    ; (acumulado*10) + dígito
+    sub bl, '0'         ; converte ASCII para número real
+    mov edx, 10         
+    mul edx             ; eax = eax*10
+    add eax, ebx        ; soma o dígito atual
+
+    inc esi             ; avança pro próximo caractere
+    dec ecx             ; diminui o contador
+    jnz .loop_conversao32
+
+.fim_conversao32:
+    imul eax, edi         ; multiplica pelo sinal (1 ou -1)
     mov esp, ebp        ; limpa as variáveis locais
     pop ebp
     ret                 ; retorna com número pronto no eax
