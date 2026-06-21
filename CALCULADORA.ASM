@@ -47,6 +47,14 @@ section .bss
 section .text
     global _start
 
+    global print
+    global print16
+    global print32
+    global input16
+    global input32
+
+    extern soma
+
 _start:
     ; programa principal
 
@@ -313,6 +321,54 @@ print16:
     dec ecx
 
 .call_print16:
+    inc ecx             ; aponta pro primeiro caractere
+    lea edx, [ebp]      ; calcula o tamanho da string
+    sub edx, ecx        ; edx = tamanho da string
+
+    push edx            ; empilha tamanho   
+    push ecx            ; empilha ponteiro
+    call print          
+    add esp, 8          ; limpa pilha
+
+    mov esp, ebp        ; limpa variáveis locais
+    pop ebp
+    ret
+
+print32:
+    push ebp
+    mov ebp, esp
+
+    sub esp, 16         ; aloca 16 bytes na pilha
+    mov eax, [ebp+8]    ; pega o parâmetro
+    lea ecx, [ebp-1]    ; ecx aponta pro fim do buffer
+    mov byte [ecx], 10  ; coloca quebra de linha no final
+    dec ecx
+
+    mov edi, 0          ; sinal negativo? (0 = não, 1 = sim)
+    cmp eax, 0
+    jge .prepara_divisao32
+    neg eax             ; transforma em positivo pra dividir
+    mov edi, 1          ; marca a flag como negativa
+
+.prepara_divisao32:
+    mov ebx, 10         ; vai dividir por 10
+
+.loop_divisao32:
+    xor edx, edx        ; zera o edx
+    div ebx             ; eax = eax/10
+    add dl, '0'         ; converte pra caractere
+    mov [ecx], dl       ; salva o caractere no buffer
+    dec ecx             ; anda pra trás no buffer
+    cmp eax, 0          ; acabou o número?
+    jnz .loop_divisao32
+
+    ; adiciona sinal negativo se precisar
+    cmp edi, 1
+    jne .call_print32
+    mov byte [ecx], '-'
+    dec ecx
+
+.call_print32:
     inc ecx             ; aponta pro primeiro caractere
     lea edx, [ebp]      ; calcula o tamanho da string
     sub edx, ecx        ; edx = tamanho da string
