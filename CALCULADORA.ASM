@@ -273,7 +273,55 @@ input32:
     jnz .loop_conversao32
 
 .fim_conversao32:
-    imul eax, edi         ; multiplica pelo sinal (1 ou -1)
+    imul eax, edi       ; multiplica pelo sinal (1 ou -1)
     mov esp, ebp        ; limpa as variáveis locais
     pop ebp
     ret                 ; retorna com número pronto no eax
+
+print16:
+    push ebp
+    mov ebp, esp
+
+    sub esp, 8          ; aloca 8 bytes na pilha
+    mov eax, [ebp+8]    ; pega o parâmetro
+    lea ecx, [ebp-1]    ; ecx aponta pro fim do buffer
+    mov byte [ecx], 10  ; coloca quebra de linha no final
+    dec ecx
+
+    mov di, 0           ; sinal negativo? (0 = não, 1 = sim)
+    cmp ax, 0
+    jge .prepara_divisao16
+    neg ax              ; transforma em positivo pra dividir
+    mov di, 1           ; marca a flag como negativa
+
+.prepara_divisao16:
+    mov bx, 10          ; vai dividir por 10
+
+.loop_divisao16:
+    xor dx, dx          ; zera o edx
+    div bx              ; eax = eax/10
+    add dl, '0'         ; converte pra caractere
+    mov [ecx], dl       ; salva o caractere no buffer
+    dec ecx             ; anda pra trás no buffer
+    cmp ax, 0           ; acabou o número?
+    jnz .loop_divisao16
+
+    ; adiciona sinal negativo se precisar
+    cmp di, 1
+    jne .call_print16
+    mov byte [ecx], '-'
+    dec ecx
+
+.call_print16:
+    inc ecx             ; aponta pro primeiro caractere
+    lea edx, [ebp]      ; calcula o tamanho da string
+    sub edx, ecx        ; edx = tamanho da string
+
+    push edx            ; empilha tamanho   
+    push ecx            ; empilha ponteiro
+    call print          
+    add esp, 8          ; limpa pilha
+
+    mov esp, ebp        ; limpa variáveis locais
+    pop ebp
+    ret
