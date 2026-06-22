@@ -104,6 +104,7 @@ _start:
     call input
     add esp, 8
 
+loop_menu:
     ; imprime msg5 (menu)
     push len_msg5
     push msg5
@@ -151,7 +152,48 @@ _start:
     push opcao
     call input
     add esp, 8
+    mov al, [opcao] ; carrega o caractere digitado
 
+    cmp al, '1'     ; usuário escolheu soma?
+    je call_soma
+
+    ;cmp al, '2'    ; usuário escolheu subtração?
+    ;je call_sub
+
+    ;cmp al, '3'    ; usuário escolheu multiplicação?
+    ;je call_mul
+
+    ;cmp al, '4'    ; usuário escolheu divisão?
+    ;je call_div
+
+    ;cmp al, '5'    ; usuário escolheu exponenciação?
+    ;je call_exp
+
+    ;cmp al, '6'    ; usuário escolheu mod?
+    ;je call_mod
+
+    cmp al, '7'     ; usuário escolheu sair?
+    je fim_programa
+
+    jmp loop_menu
+
+call_soma:
+    mov al, [precisao]
+    sub al, '0'         ; converte o caractere '0'/'1' para número
+    movzx eax, al       ; garante que o resto do registrador está zerado
+    push eax            ; empilha a precisão
+
+    call soma           ; pula pro arquivo SOMA.ASM
+    add esp, 4          ; limpa parâmetro da pilha
+
+    ; buffer temporário para segurar o programa até que o usuário aperte ENTER
+    push 2
+    push opcao
+    call input
+    add esp, 8
+    jmp loop_menu       ; retorna pro menu
+
+fim_programa:
     ; fim do programa
     mov eax, 1      ; syscall de exit
     mov ebx, 0      ; codigo de retorno
