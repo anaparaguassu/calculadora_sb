@@ -37,7 +37,6 @@ section .data
     msg_menu7 db ' 7: SAIR', 10, 'Opção: ', 0
     len_menu7 equ $ - msg_menu7
 
-
 section .bss
     ; variaveis globais
     nome resb 50        ; reserva 50 bytes pro nome
