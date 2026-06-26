@@ -69,5 +69,18 @@ multiplicacao:
     je .mul_16
 
 .mul_32:
+    mov eax, [ebp-4]
+    imul eax, [ebp-8]       ; multiplica e resultado fica em eax
+    jo .trata_overflow      ; se estourar o limite de 32 bits, pula pra erro
+    jmp .print_resultado
 
 .mul_16:
+    mov ax, [ebp-4]
+    imul ax, word [ebp-8]   ; como exige 16 bits pegamos a parte baixa (word) da memória
+    jo .trata_overflow      ; se estourar 16 bits, pula pra erro
+    movsx eax, ax           ; estende pra 32 bits para printar
+    jmp .print_resultado
+
+.trata_overflow:
+
+.print_resultado:
