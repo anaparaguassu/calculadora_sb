@@ -1,5 +1,5 @@
 section .data
-    ; Mensagens específicas da operação soma
+    ; Mensagens específicas da operação subtração
     msg_sub1 db 'Digite o primeiro número: ', 0
     len_sub1 equ $ - msg_sub1
 
@@ -59,7 +59,7 @@ subtracao:
 .salva_n2:
     mov [ebp-8], eax
 
-    ; operação de soma reipeitando a precisão
+    ; operação de subtração reipeitando a precisão
     mov eax, [ebp+8]
     cmp eax, 0
     je .sub_16
