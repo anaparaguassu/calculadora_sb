@@ -9,7 +9,7 @@ section .data
     msg_res db 'Resultado da multiplicação: ', 0
     len_res equ $ - msg_res
 
-    ; Mensagem exigida pela especificação
+    ; Mensagem de overflow
     msg_over db 'OCORREU OVERFLOW.', 10, 0
     len_over equ $ - msg_over
 
@@ -82,5 +82,15 @@ multiplicacao:
     jmp .print_resultado
 
 .trata_overflow:
+    ; printa mensagem de erro - overflow
+    push len_over
+    push msg_over
+    call print
+    add esp, 8
+    
+    ; força o encerramento do programa com a syscall de exit
+    mov eax, 1
+    mov ebx, 1
+    int 0x80
 
 .print_resultado:
