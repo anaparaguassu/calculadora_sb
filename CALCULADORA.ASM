@@ -54,6 +54,7 @@ section .text
 
     extern soma
     extern subtracao
+    extern multiplicacao
 
 _start:
     ; programa principal
@@ -160,8 +161,8 @@ loop_menu:
     cmp al, '2'    ; usuário escolheu subtração?
     je call_sub
 
-    ;cmp al, '3'    ; usuário escolheu multiplicação?
-    ;je call_mul
+    cmp al, '3'    ; usuário escolheu multiplicação?
+    je call_mul
 
     ;cmp al, '4'    ; usuário escolheu divisão?
     ;je call_div
@@ -199,7 +200,23 @@ call_sub:
     movzx eax, al       ; garante que o resto do registrador está zerado
     push eax            ; empilha a precisão
 
-    call subtracao           ; pula pro arquivo SOMA.ASM
+    call subtracao      ; pula pro arquivo SUBTRACAO.ASM
+    add esp, 4          ; limpa parâmetro da pilha
+
+    ; buffer temporário para segurar o programa até que o usuário aperte ENTER
+    push 2
+    push opcao
+    call input
+    add esp, 8
+    jmp loop_menu       ; retorna pro menu
+
+call_mul:
+    mov al, [precisao]
+    sub al, '0'         ; converte o caractere '0'/'1' para número
+    movzx eax, al       ; garante que o resto do registrador está zerado
+    push eax            ; empilha a precisão
+
+    call multiplicacao  ; pula pro arquivo MULTIPLICACAO.ASM
     add esp, 4          ; limpa parâmetro da pilha
 
     ; buffer temporário para segurar o programa até que o usuário aperte ENTER
