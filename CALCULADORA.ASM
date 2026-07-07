@@ -55,6 +55,7 @@ section .text
     extern soma
     extern subtracao
     extern multiplicacao
+    extern divisao
 
 _start:
     ; programa principal
@@ -164,8 +165,8 @@ loop_menu:
     cmp al, '3'    ; usuário escolheu multiplicação?
     je call_mul
 
-    ;cmp al, '4'    ; usuário escolheu divisão?
-    ;je call_div
+    cmp al, '4'    ; usuário escolheu divisão?
+    je call_div
 
     ;cmp al, '5'    ; usuário escolheu exponenciação?
     ;je call_exp
@@ -217,6 +218,22 @@ call_mul:
     push eax            ; empilha a precisão
 
     call multiplicacao  ; pula pro arquivo MULTIPLICACAO.ASM
+    add esp, 4          ; limpa parâmetro da pilha
+
+    ; buffer temporário para segurar o programa até que o usuário aperte ENTER
+    push 2
+    push opcao
+    call input
+    add esp, 8
+    jmp loop_menu       ; retorna pro menu
+
+call_div:
+    mov al, [precisao]
+    sub al, '0'         ; converte o caractere '0'/'1' para número
+    movzx eax, al       ; garante que o resto do registrador está zerado
+    push eax            ; empilha a precisão
+
+    call divisao        ; pula pro arquivo DIVISAO.ASM
     add esp, 4          ; limpa parâmetro da pilha
 
     ; buffer temporário para segurar o programa até que o usuário aperte ENTER
