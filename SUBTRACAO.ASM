@@ -59,7 +59,7 @@ subtracao:
 .salva_n2:
     mov [ebp-8], eax
 
-    ; operação de subtração reipeitando a precisão
+    ; operação de subtração respeitando a precisão
     mov eax, [ebp+8]
     cmp eax, 0
     je .sub_16

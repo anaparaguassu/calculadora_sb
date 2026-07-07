@@ -58,3 +58,45 @@ divisao:
 
 .salva_n2:
     mov [ebp-8], eax
+
+    ; operação de multiplicação respeitando a precisão
+    mov eax, [ebp+8]
+    cmp eax, 0
+    je .div_16
+
+.div_32:
+    mov eax, [ebp-4]        ; coloca dividendo no eax
+    cdq                     ; estende sinal de eax pra edx (edx:eax)
+    idiv dword [ebp-8]      ; divide pelo divisor, quociente = eax e resto = edx
+    jmp .print_resultado
+
+.div_16:
+    mov ax, [ebp-4]         ; coloca dividendo no ax
+    cwd                     ; estende sinal de ax pra dx (dx:ax)
+    idiv word [ebp-8]       ; divide pelo divisor, quociente = ax e resto = dx
+    movsx eax, ax           ; estende o quociente pra 32 bits para printar
+
+.print_resultado:
+    push eax
+    push len_res
+    push msg_res
+    call print 
+    add esp, 8
+
+    pop eax
+    push eax
+
+    mov ebx, [ebp+8]
+    cmp ebx, 0
+    je .print_n16
+    call print32
+    jmp .fim
+
+.print_n16:
+    call print16
+
+.fim:
+    pop eax
+    mov esp, ebp
+    pop ebp
+    ret

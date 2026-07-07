@@ -63,7 +63,7 @@ multiplicacao:
 .salva_n2:
     mov [ebp-8], eax
 
-    ; operação de multiplicação reipeitando a precisão
+    ; operação de multiplicação respeitando a precisão
     mov eax, [ebp+8]
     cmp eax, 0
     je .mul_16

@@ -59,7 +59,7 @@ soma:
 .salva_n2:
     mov [ebp-8], eax
 
-    ; operação de soma reipeitando a precisão
+    ; operação de soma respeitando a precisão
     mov eax, [ebp+8]
     cmp eax, 0
     je .soma_16
