@@ -57,3 +57,47 @@ modulo:
 
 .salva_n2:
     mov [ebp-8], eax
+
+    ; operação de MOD respeitando a precisão
+    mov eax, [ebp+8]
+    cmp eax, 0
+    je .mod_16
+
+; a lógica vai ser igual a divisão + mover o resto pro eax
+.mod_32:
+    mov eax, [ebp-4]        ; coloca dividendo no eax
+    cdq                     ; estende sinal de eax pra edx (edx:eax)
+    idiv dword [ebp-8]      ; divide pelo divisor, quociente = eax e resto = edx
+    mov eax, edx            ; move o resto pro eax
+    jmp .print_resultado
+
+.mod_16:
+    mov ax, [ebp-4]         ; coloca dividendo no ax
+    cwd                     ; estende sinal de ax pra dx (dx:ax)
+    idiv word [ebp-8]       ; divide pelo divisor, quociente = ax e resto = dx
+    movsx eax, dx           ; move o resto pro eax e estende pra 32 bits para printar
+
+.print_resultado:
+    push eax
+    push len_res
+    push msg_res
+    call print 
+    add esp, 8
+
+    pop eax
+    push eax
+
+    mov ebx, [ebp+8]
+    cmp ebx, 0
+    je .print_n16
+    call print32
+    jmp .fim
+
+.print_n16:
+    call print16
+
+.fim:
+    pop eax
+    mov esp, ebp
+    pop ebp
+    ret
