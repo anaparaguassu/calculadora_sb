@@ -69,6 +69,11 @@ modulo:
     cdq                     ; estende sinal de eax pra edx (edx:eax)
     idiv dword [ebp-8]      ; divide pelo divisor, quociente = eax e resto = edx
     mov eax, edx            ; move o resto pro eax
+
+    ; garante mod sempre positivo
+    cmp eax, 0
+    jge .print_resultado
+    neg eax                 ; se for menor que 0, inverte o sinal
     jmp .print_resultado
 
 .mod_16:
@@ -76,6 +81,11 @@ modulo:
     cwd                     ; estende sinal de ax pra dx (dx:ax)
     idiv word [ebp-8]       ; divide pelo divisor, quociente = ax e resto = dx
     movsx eax, dx           ; move o resto pro eax e estende pra 32 bits para printar
+
+    ; garante mod sempre positivo
+    cmp eax, 0
+    jge .print_resultado
+    neg eax                 ; se for menor que 0, inverte o sinal
 
 .print_resultado:
     push eax
