@@ -110,5 +110,38 @@ exponenciacao:
     jmp .print_resultado
 
 .trata_overflow:
+    ; printa mensagem de erro - overflow
+    push len_over
+    push msg_over
+    call print
+    add esp, 8
+
+    ; força o encerramento do programa com a syscall de exit
+    mov eax, 1
+    mov ebx, 1
+    int 0x80
 
 .print_resultado:
+    push eax
+    push len_res
+    push msg_res
+    call print 
+    add esp, 8
+
+    pop eax
+    push eax
+
+    mov ebx, [ebp+8]
+    cmp ebx, 0
+    je .print_n16
+    call print32
+    jmp .fim
+
+.print_n16:
+    call print16
+
+.fim:
+    pop eax
+    mov esp, ebp
+    pop ebp
+    ret
