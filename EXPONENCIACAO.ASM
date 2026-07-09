@@ -8,7 +8,7 @@ section .data
     msg_res db 'Resultado da exponenciacao: ', 0
     len_res equ $ - msg_res
 
-    ; Mensagem obrigatória de erro
+    ; Mensagem de overflow
     msg_over db 'OCORREU OVERFLOW.', 10, 0
     len_over equ $ - msg_over
 
@@ -24,7 +24,7 @@ section .text
 exponenciacao:
     push ebp
     mov ebp, esp
-    sub esp, 8          ; aloca 8 bytes na pilha para guardar n1 e n2
+    sub esp, 8              ; aloca 8 bytes na pilha para guardar n1 e n2
 
     ; lê o n1 = [ebp-4]
     push len_exp1
@@ -33,7 +33,7 @@ exponenciacao:
     add esp, 8
 
     mov eax, [ebp+8]
-    cmp eax, 0          ; verifica precisão (0 = 16 bits, 1 = 32 bits)
+    cmp eax, 0              ; verifica precisão (0 = 16 bits, 1 = 32 bits)
     je .ler_n1_16
     call input32
     jmp .salva_n1
@@ -42,7 +42,7 @@ exponenciacao:
     call input16
 
 .salva_n1:
-    mov [ebp-4], eax    ; salva o na variável local
+    mov [ebp-4], eax        ; salva o na variável local
 
     ; lê o n2 = [ebp-8]
     push len_exp2
@@ -61,3 +61,54 @@ exponenciacao:
 
 .salva_n2:
     mov [ebp-8], eax
+
+    mov eax, [ebp+8]
+    cmp eax, 0
+    je .exp_16
+
+.exp_32:
+    mov ecx, [ebp-8]        ; ecx = contador (expoente)
+    mov ebx, [ebp-4]        ; ebx = base
+    mov eax, 1              ; eax = resultado acumulado começando em 1
+
+    cmp ecx, 0
+    je .print_resultado     ; se expoente = 0, resultado = 1
+    jl .exp_negativo_32     ; se expoente < 0
+
+.loop_exp_32:
+    imul eax, ebx           ; acumulador*base
+    jo .trata_overflow      ; se estourar, overflow 
+    dec ecx                 ; diminui contador
+    jnz .loop_exp_32        ; se ecx > 0, volta pro loop
+    jmp .print_resultado
+
+.exp_negativo_32:
+    mov eax, 0              ; se expoente < 0 em inteiros, resultado = 0
+    jmp .print_resultado    
+
+.exp_16:
+    mov cx, [ebp-8]         ; cx = contador (expoente)
+    mov bx, [ebp-4]         ; bx = base
+    mov ax, 1               ; ax = resultado acumulado começando em 1
+
+    cmp cx, 0               
+    je .extende_16          ; se expoente = 0, resultado = 1
+    jl .exp_negativo_16     ; se expoente < 0
+
+.loop_exp_16:
+    imul ax, bx             ; acumulador*base
+    jo .trata_overflow      ; se estourar, overflow
+    dec cx                  ; diminui contador
+    jnz .loop_exp_16        ; se cx > 0, volta pro loop
+    jmp .extende_16
+
+.exp_negativo_16:
+    mov ax, 0               ; se expoente < 0 em inteiros, resultado = 0
+
+.extende_16:
+    movsx eax, ax           ; estende o resultado final de ax pra eax
+    jmp .print_resultado
+
+.trata_overflow:
+
+.print_resultado:
