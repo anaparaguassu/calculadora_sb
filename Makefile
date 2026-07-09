@@ -8,7 +8,7 @@ LD = ld
 LDFLAGS = -m elf_i386
 
 # Lista de todos os arquivos objeto que precisamos gerar
-OBJS = CALCULADORA.o SOMA.o SUBTRACAO.o MULTIPLICACAO.o DIVISAO.o MOD.o
+OBJS = CALCULADORA.o SOMA.o SUBTRACAO.o MULTIPLICACAO.o DIVISAO.o MOD.o EXPONENCIACAO.o
 
 # Regra principal: o que acontece quando você digita apenas 'make'
 all: $(TARGET)

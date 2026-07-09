@@ -15,7 +15,7 @@ section .data
 section .text
     global exponenciacao
 
-    extern imprimir_string
+    extern print
     extern print16
     extern print32
     extern input16

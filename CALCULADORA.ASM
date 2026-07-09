@@ -57,6 +57,7 @@ section .text
     extern multiplicacao
     extern divisao
     extern modulo
+    extern exponenciacao
 
 _start:
     ; programa principal
@@ -169,8 +170,8 @@ loop_menu:
     cmp al, '4'    ; usuário escolheu divisão?
     je call_div
 
-    ;cmp al, '5'    ; usuário escolheu exponenciação?
-    ;je call_exp
+    cmp al, '5'    ; usuário escolheu exponenciação?
+    je call_exp
 
     cmp al, '6'    ; usuário escolheu mod?
     je call_mod
@@ -251,6 +252,22 @@ call_mod:
     push eax            ; empilha a precisão
 
     call modulo         ; pula pro arquivo MOD.ASM
+    add esp, 4          ; limpa parâmetro da pilha
+
+    ; buffer temporário para segurar o programa até que o usuário aperte ENTER
+    push 2
+    push opcao
+    call input
+    add esp, 8
+    jmp loop_menu       ; retorna pro menu
+
+call_exp:
+    mov al, [precisao]
+    sub al, '0'         ; converte o caractere '0'/'1' para número
+    movzx eax, al       ; garante que o resto do registrador está zerado
+    push eax            ; empilha a precisão
+
+    call exponenciacao  ; pula pro arquivo EXPONENCIACAO.ASM
     add esp, 4          ; limpa parâmetro da pilha
 
     ; buffer temporário para segurar o programa até que o usuário aperte ENTER
